@@ -1,8 +1,7 @@
-from data.config import cfg
+from data.config import cfg, process_funcs_dict
 from data.dataset import CocoDataset
 from data.loader import build_dataloader
 from modules.solov2 import SOLOV2
-from data.transform_registry import build_pipeline
 import torch.optim as optim
 import torch
 from tqdm import tqdm
@@ -20,6 +19,18 @@ def gradinator(x):
     x.requires_grad = False
     return x
 
+def build_process_pipeline(pipeline_config):
+    """Build data processing pipeline from config."""
+    assert isinstance(pipeline_config, list)
+    process_pipelines = []
+    for pipconfig in pipeline_config:
+        assert isinstance(pipconfig, dict) and 'type' in pipconfig
+        args = pipconfig.copy()
+        obj_type = args.pop('type')
+        if isinstance(obj_type, str):
+            process_pipelines.append(process_funcs_dict[obj_type](**args))
+    return process_pipelines
+
 def get_warmup_lr(cur_iters, warmup_iters, base_lr, warmup_ratio):
     """Calculate learning rate during warmup period.""" #? Linear works for now.
     k = (1 - cur_iters / warmup_iters) * (1 - warmup_ratio)
@@ -28,8 +39,8 @@ def get_warmup_lr(cur_iters, warmup_iters, base_lr, warmup_ratio):
 
 def train(epoch_iters=1, total_epochs=36):
     """Main training function."""
-    # Build data pipeline using the new simplified approach
-    transforms_pipelines = build_pipeline(cfg.train_config.train_pipeline)
+    # Build data pipeline
+    transforms_pipelines = build_process_pipeline(cfg.train_config.train_pipeline)
     
     # Build dataset
     dataset = CocoDataset(ann_file=cfg.dataset.train_info,
