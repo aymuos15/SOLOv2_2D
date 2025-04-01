@@ -40,15 +40,13 @@ class LoadImage(object):
 def eval(valmodel_weight, data_path):
     test_pipeline = []
     transforms = [
-        # dict(type='Resize', keep_ratio=True),
                   dict(type='Normalize', mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True),
                   dict(type='Pad', size_divisor=32),
                   dict(type='ImageToTensor', keys=['img']),
                   dict(type='TestCollect', keys=['img']),
                   ]
     transforms_piplines = build_process_pipeline(transforms)
-    Multest = process_funcs_dict['MultiScaleFlipAug'](transforms=transforms_piplines, img_scale=(480, 448), flip=False)
-
+    Multest = process_funcs_dict['Format'](transforms=transforms_piplines)
 
     test_pipeline.append(LoadImage())
     test_pipeline.append(Multest)

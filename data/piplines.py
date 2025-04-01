@@ -249,27 +249,17 @@ class TestCollect(Collect):
         return data
 
 @dataclass
-class MultiScaleFlipAug(BaseTransform):
-    """Test-time augmentation with multiple scales and flipping."""
+class Format(BaseTransform):
+    """Test-time augmentation without scaling."""
     transforms: List[Any]
-    img_scale: Any
-    flip: bool = False
     
     def __post_init__(self):
         self.transforms = Compose(self.transforms)
-        self.img_scale = self.img_scale if isinstance(self.img_scale, list) else [self.img_scale]
     
     def __call__(self, results: Dict[str, Any]) -> Dict[str, Any]:
-        aug_data = []
-        flip_aug = [False, True] if self.flip else [False]
+        _results = results.copy()
+        output = self.transforms(_results)
         
-        for scale in self.img_scale:
-            for flip in flip_aug:
-                _results = results.copy()
-                _results['scale'] = scale
-                _results['flip'] = flip
-                aug_data.append(self.transforms(_results))
-                
-        # Convert list of dicts to dict of lists
-        aug_data_dict = {key: [data[key] for data in aug_data] for key in aug_data[0]}
+        # Wrap the single output in a list format expected by the model
+        aug_data_dict = {key: [output[key]] for key in output}
         return aug_data_dict

@@ -1,4 +1,4 @@
-from .piplines import LoadImageFromFile, LoadAnnotations, Normalize, DefaultFormatBundle, Collect, TestCollect, Pad, MultiScaleFlipAug, ImageToTensor
+from .piplines import LoadImageFromFile, LoadAnnotations, Normalize, DefaultFormatBundle, Collect, TestCollect, Pad, Format, ImageToTensor
 
 process_funcs_dict = {'LoadImageFromFile':  LoadImageFromFile,
                       'LoadAnnotations': LoadAnnotations,
@@ -7,7 +7,7 @@ process_funcs_dict = {'LoadImageFromFile':  LoadImageFromFile,
                       'Collect': Collect,
                       'TestCollect': TestCollect,
                       'Pad': Pad,
-                      'MultiScaleFlipAug': MultiScaleFlipAug, # This is only in testing anyways
+                      'Format': Format, # This is only in testing anyways
                       'ImageToTensor': ImageToTensor}
 
 # These are in RGB and are for ImageNet
@@ -126,16 +126,6 @@ train_config = Config({
 # ----------------------- TEST PIPELINE ----------------------- #
 test_pipeline = [
     dict(type='LoadImageFromFile'),
-    dict(
-        type='MultiScaleFlipAug',
-        img_scale=(768, 448),
-        flip=False,
-        transforms=[
-            dict(type='Normalize', mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True),
-            dict(type='Pad', size_divisor=32),
-            dict(type='ImageToTensor', keys=['img']),
-            dict(type='Collect', keys=['img']),
-        ])
 ]
 
 # ----------------------- TEST CONFIG ----------------------- #
