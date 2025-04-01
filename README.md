@@ -13,7 +13,7 @@ run `python /datasets/dummy_2d/make_dummydata_and_json.py`
 # To Dos
 Current implementation does generate some output. I need to make one proper training run to see if it is actually possible to run something or I have revert to the original implementation.
 
-- [] Compare with mmDet?
+- [ ] Compare with mmDet?
 
 
 # Initial Changes made to get the [reference repo](https://github.com/OpenFirework/pytorch_solov2) working.
