@@ -83,8 +83,8 @@ dummy = Config({
 # ----------------------- BACKBONES ----------------------- #
 resnet18_backbone = Config({
     'name': 'resnet18',
-    # 'path': './pretrained/resnet18_nofc.pth',
-    'path': None,
+    'path': './pretrained/resnet18_nofc.pth',
+    # 'path': None,
     'type': 'ResNetBackbone',
     'num_stages': 4,
     'frozen_stages': 1,
@@ -125,7 +125,10 @@ train_config = Config({
 
 # ----------------------- TEST PIPELINE ----------------------- #
 test_pipeline = [
-    dict(type='LoadImageFromFile'),
+    dict(type='Normalize', mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True),
+    dict(type='Pad', size_divisor=32),
+    dict(type='ImageToTensor', keys=['img']),
+    dict(type='TestCollect', keys=['img']),
 ]
 
 # ----------------------- TEST CONFIG ----------------------- #

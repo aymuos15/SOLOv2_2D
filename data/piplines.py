@@ -43,10 +43,17 @@ class LoadImageFromFile(BaseTransform):
     color_type: str = 'color'
     
     def __call__(self, results: Dict[str, Any]) -> Dict[str, Any]:
-        if results['img_prefix'] is not None:
-            filename = osp.join(results['img_prefix'], results['img_info']['filename'])
+        # Handle direct image path (used in inference)
+        if 'img' in results and isinstance(results['img'], str):
+            filename = results['img']
+        # Handle standard format with img_info (used in training)
+        elif 'img_info' in results:
+            if results['img_prefix'] is not None:
+                filename = osp.join(results['img_prefix'], results['img_info']['filename'])
+            else:
+                filename = results['img_info']['filename']
         else:
-            filename = results['img_info']['filename']
+            raise ValueError("Cannot find image path in results. Need either 'img' as string or 'img_info'.")
             
         img = cv2.imread(filename, cv2.IMREAD_COLOR)
         if self.to_float32:

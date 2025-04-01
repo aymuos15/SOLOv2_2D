@@ -25,30 +25,14 @@ def build_process_pipeline(pipeline_confg):
             process_pipelines.append(process_funcs_dict[obj_type](**args))
     return process_pipelines
 
-class LoadImage(object):
-    def __call__(self, results):
-        if isinstance(results['img'], str):
-            results['filename'] = results['img']
-        else:
-            results['filename'] = None 
-        img = cv.imread(results['img'])
-        results['img'] = img
-        results['img_shape'] = img.shape
-        results['ori_shape'] = img.shape
-        return results
-
 def eval(valmodel_weight, data_path):
     test_pipeline = []
-    transforms = [
-                  dict(type='Normalize', mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True),
-                  dict(type='Pad', size_divisor=32),
-                  dict(type='ImageToTensor', keys=['img']),
-                  dict(type='TestCollect', keys=['img']),
-                  ]
-    transforms_piplines = build_process_pipeline(transforms)
+    
+    # Using test_pipeline from config instead of test_transforms
+    transforms_piplines = build_process_pipeline(cfg.test_config.test_pipeline)
     Multest = process_funcs_dict['Format'](transforms=transforms_piplines)
 
-    test_pipeline.append(LoadImage())
+    test_pipeline.append(process_funcs_dict['LoadImageFromFile']())
     test_pipeline.append(Multest)
     test_pipeline = Compose(test_pipeline)
 
@@ -81,7 +65,7 @@ def eval(valmodel_weight, data_path):
             # Visualize and save results
             fig, ax = plt.subplots(1, 2, figsize=(10, 10))
             ax[0].imshow(raw_img)
-            ax[0].set_title(f'Original Image')
+            ax[0].set_title('Original Image')
             ax[1].imshow(seg_img)
             ax[1].set_title(f'Seg Result | Class: {classes} | Score: {scores}')
             plt.tight_layout()
