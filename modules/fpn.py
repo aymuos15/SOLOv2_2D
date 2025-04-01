@@ -1,7 +1,7 @@
 import torch.nn as nn
 import torch.nn.functional as F
 
-from .nninit import xavier_init
+from .utils.nninit import xavier_init
 
 class FPN(nn.Module):
     
